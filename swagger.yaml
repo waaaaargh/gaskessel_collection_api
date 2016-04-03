@@ -1,0 +1,94 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: Gaskessel Message collection API
+
+definitions:
+  Message:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Internal ID (unique) 
+      sender_name:
+        type: string
+        description: Name of the sender
+      channel_name:
+        type: string
+        description: |
+          name of the channel through which the message has been received.          Possible channel names are: twitter, web, facebook, whatsapp, web
+      time_received:
+        type: integer
+        description: |
+          UNIX epoch of the time the message has been received in local time.
+
+paths:
+  /message:
+    get:
+      description: |
+        Deliver an array of `Message` Objects as HTTP Stream
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Message"
+    post:
+      description: |
+        Submit a new message to the collection API
+      responses:
+        200:
+          description: The message has been submitted successfully.
+      parameters:
+        - name: channel_name
+          description: |
+            Name of the channel, see `Message` Object
+          in: query
+          type: string
+          required: true
+        - name: sender_name
+          description: |
+            Name of the sender, see `Message` Object
+          in: query
+          type: string
+          required: true
+        - name: message_text
+          description: |
+            Text of the message, see `Message` Object
+          in: query
+          type: string
+          required: true
+          
+  /message/{id}:
+    get:
+      description: |
+        Deliver the message referenced by `id` as a JSON object
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Message"
+    delete:
+      description: |
+        Delete the message referenced by `id` as a JSON object
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: The message has been deleted
+        204:
+          description: No message to delete
